@@ -1,0 +1,32 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    container_name: mysqldockertest
+    restart: always
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: dockertest
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: 123456789
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+  test-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    restart:
+      always
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/dockertest?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456789
